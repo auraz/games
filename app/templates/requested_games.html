@@ -1,0 +1,7 @@
+{% if requested_games %}
+  Your requests: <br>
+  {% for name, datetime, interval, match in requested_games %}
+        {{ name }} at {{ datetime }} within {{interval}} interval  {{ ' has match %s ' % match if match }} {{ 'Approve?' if match }}
+        <br>
+  {% endfor %}
+{% endif %}

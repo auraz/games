@@ -1,0 +1,33 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Select game and time</h1>
+  <form action="" method="post" name="request_game">
+      {{form.hidden_tag()}}
+      <table>
+          <tr>
+              <td>Select game:</td>
+              <td>{{ form.game_id() }}</td>
+              {% for error in form.errors.game_id %}
+              <br><span style="color: red;">[{{ error }}]</span>
+              {% endfor %}
+          </tr>
+          <tr>
+              <td>Select time and interval in minutes:</td>
+              <td>{{ form.schedule_datetime() }}</td>
+              {% for error in form.errors.datetime %}
+              <br><span style="color: red;">[{{ error }}]</span>
+              {% endfor %}
+              <td>{{ form.interval() }}</td>
+              {% for error in form.errors.datetime %}
+              <br><span style="color: red;">[{{ error }}]</span>
+              {% endfor %}
+          </tr>
+          <tr>
+              <td></td>
+              <td><input type="submit" value="Save Changes"></td>
+          </tr>
+      </table>
+  </form>
+{% endblock %}
