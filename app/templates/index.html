@@ -3,6 +3,7 @@
 
 
     <h2>Hi, {{ current_user.nickname }}!</h2>
+
     {% for assosiation in assosiations %}
         <div><p>{{ assosiation.player.nickname }} says: <b>{{ assosiation.player.email }}</b></p></div>
     {% endfor %}
