@@ -7,12 +7,15 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 WTF_CSRF_ENABLED = True
 SECRET_KEY = 'you-will-never-guess'
 
-OPENID_PROVIDERS = [
-    {'name': 'Google', 'url': 'https://www.google.com/accounts/o8/id'},
-    {'name': 'Yahoo', 'url': 'https://me.yahoo.com'},
-    {'name': 'AOL', 'url': 'http://openid.aol.com/<username>'},
-    {'name': 'Flickr', 'url': 'http://www.flickr.com/<username>'},
-    {'name': 'MyOpenID', 'url': 'https://www.myopenid.com'}]
+
+OAUTH_CREDENTIALS = {
+    'facebook': {
+        'id': '1442284859395087',
+        'secret': '14ebf40d89912aa2b353df1fc9d1b4b1',
+        # But it is also an OAuth 2.0 provider and it needs scope.
+        'scope': ['user_about_me', 'email', 'publish_stream'],
+    },
+}
 
 
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
