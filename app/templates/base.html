@@ -1,31 +1,35 @@
 <html>
   <head>
     {% if title %}
-    <title>{{ title }} - microblog</title>
+        <title>{{ title }} - Teams for me</title>
     {% else %}
-    <title>microblog</title>
+        <title>Teams for me</title>
     {% endif %}
   </head>
   <body>
-    <div>Microblog:
+    <div>Teams for me LOGO:
         <a href="{{ url_for('index') }}">Home</a>
         {% if g.user.is_authenticated() %}
         | <a href="{{ url_for('user', nickname=g.user.nickname) }}">Your Profile</a>
         | <a href="{{ url_for('request_game', nickname=g.user.nickname) }}">Request Game</a>
         | <a href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+            <a href="{{ url_for('oauth_authorize', provider='facebook') }}">Login with Facebook</a>
         {% endif %}
     </div>
-    <hr>
+
     {% with messages = get_flashed_messages() %}
-    {% if messages %}
-    <ul>
-    {% for message in messages %}
-        <li>{{ message }} </li>
-    {% endfor %}
-    </ul>
-    {% endif %}
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }} </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
     {% endwith %}
+
     {% include 'requested_games.html' %}
+
     {% block content %}{% endblock %}
   </body>
 </html>

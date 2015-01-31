@@ -51,8 +51,9 @@ def login():
 
 
 @app.route('/index')
-@login_required
 def index():
+    if current_user.is_anonymous():
+        return redirect(url_for('login'))
     user = g.user
     games = [
         {
@@ -119,8 +120,6 @@ def before_request():
         db.session.commit()
 
 
-
-# @oid.after_login
 def after_login(resp):
     if resp.email is None or resp.email == "":
         flash('Invalid login. Please try again.')
@@ -145,7 +144,7 @@ def after_login(resp):
 @app.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    return redirect(url_for('login'))
 
 
 @app.route('/user/<nickname>')
