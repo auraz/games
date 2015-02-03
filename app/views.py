@@ -47,7 +47,7 @@ def oauth_callback(provider):
 def login():
     if not current_user.is_anonymous():
         return redirect(url_for('index'))
-    return render_template('login.html')
+    return render_template('index.html')
 
 
 @app.route('/index')
