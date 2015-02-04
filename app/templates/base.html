@@ -80,7 +80,7 @@
 		<div class="hidden-header"></div>
 		<header class="clearfix">
 
-			<!-- Start Header ( Logo & Naviagtion ) -->
+			<!-- Start Header ( Logo & Navigation ) -->
 			<div class="navbar navbar-default navbar-top">
 				<div class="container">
 					<div class="navbar-header">
@@ -89,7 +89,7 @@
 							<i class="fa fa-bars"></i>
 						</button>
 						<!-- End Toggle Nav Link For Mobiles -->
-						<a class="navbar-brand" href="index.html"><img alt="" src="static/images/margo.png"></a>
+						<a class="navbar-brand" href="index.html"><img alt="" src="static/images/logo/temp_logo.jpg"></a>
 					</div>
 					<div class="navbar-collapse collapse">
 						<!-- Start Navigation List -->
@@ -110,6 +110,13 @@
 							<li>
 								<a href="portfolio-2.html">Portfolio</a>
 							</li>
+							{% if g.user.is_authenticated() %}
+		                    <li><a href="{{ url_for('user', nickname = g.user.nickname) }}">Your Profile</a></li>
+		                    <li><a href="{{ url_for('request_game', nickname=g.user.nickname) }}">Request Game</a></li>
+		                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+		                    {% else %}
+		                        <li><a class="btn" data-toggle="modal" data-target=".bs-modal-sm" href="#loginModal">Sign In/Register</a></li>
+		                    {% endif %}
 						</ul>
 						<!-- End Navigation List -->
 					</div>
@@ -285,19 +292,8 @@
 			<!-- End Full Width Section 1 -->
 
 
-
-
-
-
-
-
-
-
-
 		</div>
 		<!-- End Full Width Sections Content -->
-
-
 
 
 		<!-- Start Footer -->
