@@ -6,7 +6,11 @@
 <head>
 
 	<!-- Basic -->
-	<title>Team | Home</title>
+    {% if title %}
+        <title>{{ title }} - Teams for me</title>
+    {% else %}
+        <title>Teams for me</title>
+    {% endif %}
 
 	<!-- Define Charset -->
 	<meta charset="utf-8">
@@ -89,26 +93,21 @@
 							<i class="fa fa-bars"></i>
 						</button>
 						<!-- End Toggle Nav Link For Mobiles -->
-						<a class="navbar-brand" href="index.html"><img alt="" src="static/images/logo/temp_logo.jpg"></a>
+						<a class="navbar-brand" href=""{{ url_for('index') }}""><img alt="" src="static/images/logo/temp_logo.jpg"></a>
+						<a class="active navbar-brand" href=""{{ url_for('index') }}"">Teams for me</a>
 					</div>
 					<div class="navbar-collapse collapse">
 						<!-- Start Navigation List -->
 						<ul class="nav navbar-nav navbar-right">
 							<li>
-								<a class="active" href="index.html">Home</a>
-							</li>
-							<li>
-								<a href="about.html">Pages</a>
+								<a href="about.html">How it works</a>
 								<ul class="dropdown">
 									<li><a href="about.html">About</a></li>
-									<li><a href="services.html">Services</a></li>
-									<li><a href="right-sidebar.html">Right Sidebar</a></li>
-									<li><a href="left-sidebar.html">Left Sidebar</a></li>
-									<li><a href="404.html">404 Page</a></li>
+									<li><a href="services.html">FAQ</a></li>
 								</ul>
 							</li>
 							<li>
-								<a href="portfolio-2.html">Portfolio</a>
+								<a href="portfolio-2.html">Games</a>
 							</li>
 							{% if g.user.is_authenticated() %}
 		                    <li><a href="{{ url_for('user', nickname = g.user.nickname) }}">Your Profile</a></li>
@@ -219,8 +218,8 @@
 								<i class="fa fa-magic icon-mini-effect icon-effect-2 gray-icon"></i>
 							</div>
 							<div class="service-content">
-								<h4>High Quality Theme</h4>
-								<p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut <strong class="accent-color">odit aut</strong> fugit, sed quia dolores.</p>
+								<h4>Find a Team</h4>
+								<p>Find team for a game</p>
 							</div>
 						</div>
 						<!-- End Service Icon 1 -->
@@ -231,23 +230,25 @@
 								<i class="fa fa-eye icon-mini-effect icon-effect-2 gray-icon"></i>
 							</div>
 							<div class="service-content">
-								<h4>Retina Display Ready</h4>
-								<p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut <strong class="accent-color">odit aut</strong> fugit, sed quia dolores.</p>
+								<h4>Set up time</h4>
+								<p>Set up your time to play with a team</p>
 							</div>
 						</div>
 						<!-- End Service Icon 2 -->
 
-						<!-- Start Service Icon 3 -->
+
+						<!-- Start Service Icon 4 -->
 						<div class="col-md-4 col-sm-6 service-box service-icon-left">
 							<div class="service-icon">
-								<i class="fa fa-code icon-mini-effect icon-effect-2 gray-icon"></i>
+								<i class="fa fa-users icon-mini-effect icon-effect-2 gray-icon"></i>
 							</div>
 							<div class="service-content">
-								<h4>Clean Modern Code</h4>
-								<p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut <strong class="accent-color">odit aut</strong> fugit, sed quia dolores.</p>
+								<h4>Play a game</h4>
+								<p>Play games and have fun!</p>
 							</div>
 						</div>
-						<!-- End Service Icon 3 -->
+						<!-- End Service Icon 4 -->
+
 
 						<!-- Start Service Icon 4 -->
 						<div class="col-md-4 col-sm-6 service-box service-icon-left">
@@ -255,35 +256,11 @@
 								<i class="fa fa-rocket icon-mini-effect icon-effect-2 gray-icon"></i>
 							</div>
 							<div class="service-content">
-								<h4>Fast & Light Theme</h4>
-								<p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut <strong class="accent-color">odit aut</strong> fugit, sed quia dolores.</p>
+								<h4>Soon more</h4>
+								<p>Create you own team, geographic locations, sport games.</p>
 							</div>
 						</div>
 						<!-- End Service Icon 4 -->
-
-						<!-- Start Service Icon 5 -->
-						<div class="col-md-4 col-sm-6 service-box service-icon-left">
-							<div class="service-icon">
-								<i class="fa fa-download icon-mini-effect icon-effect-2 gray-icon"></i>
-							</div>
-							<div class="service-content">
-								<h4>Free Updates</h4>
-								<p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut <strong class="accent-color">odit aut</strong> fugit, sed quia dolores.</p>
-							</div>
-						</div>
-						<!-- End Service Icon 5 -->
-
-						<!-- Start Service Icon 6 -->
-						<div class="col-md-4 col-sm-6 service-box service-icon-left">
-							<div class="service-icon">
-								<i class="fa fa-users icon-mini-effect icon-effect-2 gray-icon"></i>
-							</div>
-							<div class="service-content">
-								<h4>Dedicated Support</h4>
-								<p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut <strong class="accent-color">odit aut</strong> fugit, sed quia dolores.</p>
-							</div>
-						</div>
-
 					</div>
 					<!-- End Services Icons -->
 
@@ -299,45 +276,12 @@
 		<!-- Start Footer -->
 		<footer>
 			<div class="container">
-				<div class="row footer-widgets">
-
-					<!-- Start Subscribe & Social Links Widget -->
-                    <div class="col-md-3">
-                        <div class="footer-widget mail-subscribe-widget">
-                            <h4>Get in touch<span class="head-line"></span></h4>
-                            <p>Join our mailing list to stay up to date and get notices about our new releases!</p>
-                            <form class="subscribe">
-                                <input type="text" placeholder="mail@example.com">
-                                <input type="submit" class="main-button" value="Send">
-                            </form>
-                        </div>
-
-                    </div><!-- .col-md-3 -->
-                    <!-- End Subscribe & Social Links Widget -->
-
-
-                    <!-- Start Contact Widget -->
-                    <div class="col-md-3">
-                        <div class="footer-widget contact-widget">
-                            <h4><img src="static/images/footer-margo.png" class="img-responsive" alt="Footer Logo" /></h4>
-                            <p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident</p>
-                            <ul>
-                                <li><span>Phone Number:</span> +01 234 567 890</li>
-                                <li><span>Email:</span> company@company.com</li>
-                                <li><span>Website:</span> www.yourdomain.com</li>
-                            </ul>
-                        </div>
-                    </div><!-- .col-md-3 -->
-                    <!-- End Contact Widget -->
-
-
-				</div><!-- .row -->
 
 				<!-- Start Copyright -->
 				<div class="copyright-section">
 					<div class="row">
 						<div class="col-md-6">
-                            <p>&copy; 2014 Margo -  All Rights Reserved <a href="http://graygrids.com">GrayGrids</a> </p>
+                            <p>&copy; 2015 Teams for me</p>
 						</div>
 						<div class="col-md-6">
 							<ul class="footer-nav">
