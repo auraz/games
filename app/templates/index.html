@@ -1,1 +1,10 @@
 {% extends "base.html" %}
+{% block content %}
+
+{% if g.user.is_authenticated() %}
+    {% include 'requested_games.html' %}
+{% else %}
+    {% include 'promo.html' %}
+{% endif %}
+
+{% endblock %}
