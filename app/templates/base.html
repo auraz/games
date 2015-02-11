@@ -105,10 +105,10 @@
                                 <li>
                                 <li><a href="{{ url_for('request_game', nickname=g.user.nickname) }}">Request Game</a></li>
                                 <li>
-                                    <a href="about.html">How it works</a>
+                                    <a href="{{ url_for('about') }}">How it works</a>
                                     <ul class="dropdown">
-                                        <li><a href="about.html">About</a></li>
-                                        <li><a href="services.html">FAQ</a></li>
+                                        <li><a href="{{ url_for('about') }}">About</a></li>
+                                        <li><a href="{{ url_for('faq') }}">FAQ</a></li>
                                     </ul>
                                 </li>
                                 <li>
@@ -120,14 +120,14 @@
                                 </li>
                             {% else %}
     							<li>
-    								<a href="about.html">How it works</a>
+    								<a href="{{ url_for('about') }}">How it works</a>
     								<ul class="dropdown">
-    									<li><a href="about.html">About</a></li>
-    									<li><a href="services.html">FAQ</a></li>
+    									<li><a href="{{ url_for('about') }}">About</a></li>
+    									<li><a href="{{ url_for('faq') }}">FAQ</a></li>
     								</ul>
     							</li>
     							<li>
-    								<a href="portfolio-2.html">Games</a>
+    								<a href="{{ url_for('list_of_games') }}">Games to play</a>
     							</li>
 
 		                        <li><a class="btn" data-toggle="modal" data-target=".bs-modal-sm" href="#loginModal">Sign In/Register</a></li>

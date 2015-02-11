@@ -1,7 +1,7 @@
 import datetime
 import sqlalchemy
 
-from flask import render_template, flash, redirect, session, url_for, request, g
+from flask import render_template, flash, redirect, session, url_for, request, g, send_from_directory
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from flask import Flask, render_template, request, make_response
 
@@ -251,3 +251,17 @@ def not_found_error(error):
 def internal_error(error):
     db.session.rollback()
     return render_template('500.html'), 500
+
+
+@app.route('/games', methods=['GET'])
+def list_of_games():
+    return render_template('games.html')
+
+@app.route('/about', methods=['GET'])
+def about():
+    return render_template('about.html')
+
+@app.route('/faq', methods=['GET'])
+def faq():
+    return render_template('services.html')
+
