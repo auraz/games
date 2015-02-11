@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+
+        <!-- Start Page Banner -->
+        <div class="page-banner" style="padding:40px 0; background: url(src="static/images/slide-02-bg.jpg) center #f9f9f9;">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h2>FAQ</h2>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- End Page Banner -->
+
+
+
+
+        <!-- Start Content -->
+        <div id="content">
+            <div class="container">
+                <div class="page-content">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <!-- Accordion -->
+                            <div class="panel-group" id="accordion">
+
+                                <!-- Start Accordion 1 -->
+                                <div class="panel panel-default">
+                                    <!-- Toggle Heading -->
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a data-toggle="collapse" data-parent="#accordion" href="#collapse-1" class="collapsed">
+                                                <i class="fa fa-angle-up control-icon"></i>
+                                                <i class="fa fa-desktop"></i>How teams are synced
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <!-- Toggle Content -->
+                                    <div id="collapse-1" class="panel-collapse collapse ">
+                                        <div class="panel-body">Teams are synced by email, chat messengers like skype, or sms</div>
+                                    </div>
+                                </div>
+                                <!-- End Accordion 1 -->
+
+                                <!-- Start Accordion 2 -->
+                                <div class="panel panel-default">
+                                    <!-- Toggle Heading -->
+                                    <div class="panel-heading">
+                                        <h4 class="panel-title">
+                                            <a data-toggle="collapse" data-parent="#accordion" href="#collapse-2" class="collapsed">
+                                                <i class="fa fa-angle-up control-icon"></i>
+                                                <i class="fa fa-gift"></i>Terms of service
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <!-- Toggle Content -->
+                                    <div id="collapse-2" class="panel-collapse collapse">
+                                        <div class="panel-body">Terms of service</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End content -->
+
+{% endblock %}

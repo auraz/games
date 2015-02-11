@@ -263,5 +263,5 @@ def about():
 
 @app.route('/faq', methods=['GET'])
 def faq():
-    return render_template('services.html')
+    return render_template('faq.html')
 
