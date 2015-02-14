@@ -18,6 +18,9 @@ OAUTH_CREDENTIALS = {
 }
 
 
+# STEAM
+# 8F573073675A12CD747530132EF8FD78
+
 SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'app.db')
 SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
 

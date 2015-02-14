@@ -1,0 +1,39 @@
+1) f_id login
+
+id  localid fid1 None
+
+2) Link
+
+    a) get ids,
+
+    if there is no second:
+
+        id  localid fid1 stid2
+
+    if there is second:
+
+
+
+3) Log in by steam
+
+OK
+
+-----
+
+1) f_id login
+
+2) st_id login
+
+id1 localid1 fid1 None
+id2 localid2 None stid2
+
+3) Link
+
+a) get ids,
+
+    if they are different,
+
+    i) save that they are linked
+    ii) ask to merge
+        merge local_ids
+
