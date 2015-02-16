@@ -5639,3 +5639,8 @@ ul.footer-nav li a:hover {
 .navbar-collapse {
 	max-height: 340px;
 }
+
+
+.modal-dialog {
+    margin-top: 100px;
+}
