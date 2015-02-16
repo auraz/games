@@ -143,9 +143,9 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route('/user/<nickname>')
+@app.route('/<nickname>')  # why /abc/<nickname> adds prefix for static /abc/static
 @login_required
-def user(nickname):
+def nickname(nickname):
     user = User.query.filter_by(nickname=nickname).first()
     if user == None:
         flash('User %s not found.' % nickname)
@@ -168,7 +168,6 @@ def user(nickname):
     ]
     return render_template(
         "user.html",
-        title='Home',
         user=user,
         games=games,
         teams=teams,

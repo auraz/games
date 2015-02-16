@@ -57,7 +57,7 @@ class User(UserMixin, db.Model):
         if len(rv) > 1:
             rv = User.merge(rv) # finish merge, how?
         elif len(rv) == 1:
-            rv = rv[0]
+            rv = rv[0].user
         else:  # rv is None
             linked_rv = User.try_link(property, social_id)
 

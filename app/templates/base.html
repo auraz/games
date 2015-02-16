@@ -112,7 +112,7 @@
                                     </ul>
                                 </li>
                                 <li>
-                                    <a href="{{ url_for('user', nickname = g.user.nickname) }}">{{ g.user.nickname }}</a>
+                                    <a href="{{ url_for('nickname', nickname = g.user.nickname) }}">{{ g.user.nickname }}</a>
                                     <ul class="dropdown">
                                         <li><a href="{{ url_for('edit') }}">Edit profile</a></li>
                                         <li><a href="{{ url_for('logout') }}">Logout</a></li>
