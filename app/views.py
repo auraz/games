@@ -1,3 +1,4 @@
+import re
 import datetime
 import sqlalchemy
 
@@ -5,24 +6,31 @@ from flask import render_template, flash, redirect, session, url_for, request, g
 from flask.ext.login import login_user, logout_user, current_user, login_required
 from flask import Flask, render_template, request, make_response
 
-from app import app, db, lm
+from app import app, db, lm, oid
 from forms import LoginForm, EditForm, RequestGameForm
 from models import User, Game, GameRequest, Team
 from match import calculate_matches
 from oauth import OAuthSignIn
-
+from steam_openid import get_steam_userinfo
 
 import logging
 logger = logging.getLogger('authomatic.core')
 logger.addHandler(logging.StreamHandler())
 
 
+_steam_id_re = re.compile('steamcommunity.com/openid/id/(.*?)$')
+
+
 @app.route('/authorize/<provider>')
+@oid.loginhandler
 def oauth_authorize(provider):
     if not current_user.is_anonymous():
         return redirect(url_for('index'))
-    oauth = OAuthSignIn.get_provider(provider)
-    return oauth.authorize()
+    if provider == 'facebook':
+        oauth = OAuthSignIn.get_provider(provider)
+        return oauth.authorize()
+    else:  # steam
+        return oid.try_login('http://steamcommunity.com/openid')
 
 
 @app.route('/callback/<provider>')
@@ -38,6 +46,35 @@ def oauth_callback(provider):
     login_user(user, True)
     return redirect(url_for('index'))
 
+
+@oid.after_login
+def after_login(resp):
+    match = _steam_id_re.search(resp.identity_url)
+    steam_id =  match.group(1)
+    steamdata = get_steam_userinfo(steam_id)
+    nickname = steamdata['personaname']
+    import ipdb; ipdb.set_trace()
+    g.user = User.get_or_create('steam', steam_id, nickname=nickname)
+
+    # TODO, create accound and handle session.
+    if resp.email is None or resp.email == "":
+        flash('Invalid login. Please try again.')
+        return redirect(url_for('login'))
+    user = User.query.filter_by(email=resp.email).first()
+    if user is None:
+        nickname = resp.nickname
+        if nickname is None or nickname == "":
+            nickname = resp.email.split('@')[0]
+        nickname = User.make_unique_nickname(nickname)
+        user = User(nickname = nickname, email = resp.email)
+        db.session.add(user)
+        db.session.commit()
+    remember_me = False
+    if 'remember_me' in session:
+        remember_me = session['remember_me']
+        session.pop('remember_me', None)
+    login_user(user, remember = remember_me)
+    return redirect(request.args.get('next') or url_for('index'))
 
 @app.route('/')
 def login():
@@ -114,27 +151,6 @@ def before_request():
         g.user.last_seen = datetime.datetime.utcnow()
         db.session.add(g.user)
         db.session.commit()
-
-
-def after_login(resp):
-    if resp.email is None or resp.email == "":
-        flash('Invalid login. Please try again.')
-        return redirect(url_for('login'))
-    user = User.query.filter_by(email=resp.email).first()
-    if user is None:
-        nickname = resp.nickname
-        if nickname is None or nickname == "":
-            nickname = resp.email.split('@')[0]
-        nickname = User.make_unique_nickname(nickname)
-        user = User(nickname = nickname, email = resp.email)
-        db.session.add(user)
-        db.session.commit()
-    remember_me = False
-    if 'remember_me' in session:
-        remember_me = session['remember_me']
-        session.pop('remember_me', None)
-    login_user(user, remember = remember_me)
-    return redirect(request.args.get('next') or url_for('index'))
 
 
 @app.route('/logout')
