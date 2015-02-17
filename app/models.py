@@ -16,7 +16,7 @@ class UserSocial(db.Model):
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nickname = db.Column(db.String(64), index=True, unique=True)
-    about_me = db.Column(db.String(140))
+    about_me = db.Column(db.String(140)) # raise to 1000
     last_seen = db.Column(db.DateTime)
     email = db.Column(db.String(120), index=True, unique=True)
     password = db.Column(db.String(120))
@@ -24,10 +24,13 @@ class User(UserMixin, db.Model):
     user_social = db.relationship('UserSocial', uselist=False, backref="user")
 
     def avatar(self, size):
-        return 'http://www.gravatar.com/avatar/%s?d=mm&s=%d' % (
-            md5(self.email.encode('utf-8')).hexdigest(),
-            size
-        )
+        if self.email:
+            return 'http://www.gravatar.com/avatar/%s?d=mm&s=%d' % (
+                md5(self.email.encode('utf-8')).hexdigest(),
+                size
+            )
+        else:
+            pass
 
     @staticmethod
     def make_unique_nickname(nickname):
@@ -46,6 +49,13 @@ class User(UserMixin, db.Model):
     def get_or_create(property, social_id, **kwargs):
         """
         property is steam_id or facebook_id
+
+        Facebook provides username and email, email may be facebook, not active user email
+        Steam provides steam username and no email.
+
+        1. We will use facebook email by default
+        2. We will show facebook and steam nickname on user profile and retrieve it at that time
+        3. We will have our system nickname, which can be any of that nicknames
         """
 
         property = property + '_id'
