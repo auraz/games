@@ -1,3 +1,6 @@
+"""
+For merging user models initially use http://stackoverflow.com/questions/6666267/architecture-for-merging-multiple-user-accounts-together
+"""
 import datetime
 from hashlib import md5
 
@@ -7,20 +10,34 @@ from app import db
 
 
 class UserSocial(db.Model):
+    """
+    Model for social accounts.
+
+    It is linked with usual User model by FK.
+    """
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    facebook_id = db.Column(db.String(64))
-    steam_id = db.Column(db.String(40))
+    facebook_id = db.Column(db.String(64), unique=True)
+    steam_id = db.Column(db.String(40), unique=True)
 
 
 class User(UserMixin, db.Model):
+    """
+    User information, w/o social ids.
+
+    Social Ids are stored in UserSocial table.
+    """
     id = db.Column(db.Integer, primary_key=True)
     nickname = db.Column(db.String(64), index=True, unique=True)
-    about_me = db.Column(db.String(140)) # raise to 1000
+    about_me = db.Column(db.String(255))
     last_seen = db.Column(db.DateTime)
     email = db.Column(db.String(120), index=True, unique=True)
-    password = db.Column(db.String(120))
-    teams_and_games = db.relationship('TeamGameUserRelation', backref='player', lazy='dynamic')
+    #password = db.Column(db.String(120))  # why we need password?
+    teams_and_games = db.relationship(
+        'TeamGameUserRelation',
+        backref='player',
+        lazy='dynamic'
+    )
     user_social = db.relationship('UserSocial', uselist=False, backref="user")
 
     def avatar(self, size):
@@ -30,6 +47,7 @@ class User(UserMixin, db.Model):
                 size
             )
         else:
+            #  details['player']['avatarmedium']
             pass
 
     @staticmethod
@@ -46,7 +64,7 @@ class User(UserMixin, db.Model):
 
 
     @staticmethod
-    def get_or_create(property, social_id, **kwargs):
+    def get_or_create(social_type, social_id, **kwargs):
         """
         property is steam_id or facebook_id
 
@@ -58,30 +76,32 @@ class User(UserMixin, db.Model):
         3. We will have our system nickname, which can be any of that nicknames
         """
 
-        property = property + '_id'
-        if property == 'facebook_id':
-            rv = UserSocial.query.filter_by(facebook_id=social_id).all()
+        # get user social model
+        social_type = social_type + '_id'
+        if social_type == 'facebook_id':
+            user_social = UserSocial.query.filter_by(facebook_id=social_id).all()
         else:
-            rv = UserSocial.query.filter_by(steam_id=social_id).all()
+            user_social = UserSocial.query.filter_by(steam_id=social_id).all()
 
-        if len(rv) > 1:
-            rv = User.merge(rv) # finish merge, how?
-        elif len(rv) == 1:
-            rv = rv[0].user
-        else:  # rv is None
-            linked_rv = User.try_link(property, social_id)
+        assert len(user_social) < 2 # Only one User Social account for given social_id
 
-            if linked_rv:
-                return linked_rv
+        if len(user_social) == 1:  # return existing user
+            return user_social[0].user
 
-            nickname, email = kwargs.get('nickname'), kwargs.get('email')
-            rv = User(nickname=nickname, email=email)
-            user_social = UserSocial(user=rv)
-            setattr(user_social, property, social_id)
-            db.session.add(rv)
-            db.session.commit()
+        linked_rv = User.try_link(social_type, social_id)
 
-        return rv
+        if linked_rv:
+            return linked_rv
+
+        # create new user
+        nickname, email = kwargs.get('nickname'), kwargs.get('email')
+        user = User(nickname=nickname, email=email)
+        user_social = UserSocial(user=user)
+        setattr(user_social, social_type, social_id)
+        db.session.add(user)
+        db.session.commit()
+
+        return user
 
     def __repr__(self):
         return '<User %r>' % (self.nickname)

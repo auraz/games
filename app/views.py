@@ -1,4 +1,3 @@
-import re
 import datetime
 import sqlalchemy
 
@@ -11,19 +10,15 @@ from forms import LoginForm, EditForm, RequestGameForm
 from models import User, Game, GameRequest, Team
 from match import calculate_matches
 from oauth import OAuthSignIn
-from steam_openid import get_steam_userinfo
-
-import logging
-logger = logging.getLogger('authomatic.core')
-logger.addHandler(logging.StreamHandler())
-
-
-_steam_id_re = re.compile('steamcommunity.com/openid/id/(.*?)$')
+from steam_openid import get_steam_userinfo, _steam_id_re
 
 
 @app.route('/authorize/<provider>')
 @oid.loginhandler
 def oauth_authorize(provider):
+    """
+    Authorize callback for oauth provider.
+    """
     if not current_user.is_anonymous():
         return redirect(url_for('index'))
     if provider == 'facebook':
@@ -35,6 +30,9 @@ def oauth_authorize(provider):
 
 @app.route('/callback/<provider>')
 def oauth_callback(provider):
+    """
+    Oauth callback.
+    """
     if not current_user.is_anonymous():
         return redirect(url_for('index'))
     oauth = OAuthSignIn.get_provider(provider)
@@ -49,6 +47,9 @@ def oauth_callback(provider):
 
 @oid.after_login
 def after_login(resp):
+    """
+    Callback for openid logins
+    """
     match = _steam_id_re.search(resp.identity_url)
     steam_id =  match.group(1)
     if steam_id is None:
@@ -58,6 +59,9 @@ def after_login(resp):
     nickname = steamdata['personaname']
     nickname = User.make_unique_nickname(nickname)
     user = User.get_or_create('steam', steam_id, nickname=nickname)
+    if user is None:
+        flash('Authentication failed.')
+        return redirect(url_for('index'))
     login_user(user, True)  # i think login_user will store user in flask.session
     return redirect(url_for('index'))
 
