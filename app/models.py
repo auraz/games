@@ -90,8 +90,15 @@ class User(UserMixin, db.Model):
 
         linked_rv = User.try_link(social_type, social_id)
 
-        if linked_rv:
-            return linked_rv
+        # merge users if emails are equal
+        if kwargs.get('email'):  # check if we have user account with same email
+            # if so - merge accounts:
+            # it looks like user previously logged in with steam and set email
+            # and now logs with facebook
+            user = User.query.filter_by(email=kwargs.get('email')).first()
+            if user:
+                setattr(user.user_social, social_type, social_id)
+            return user
 
         # create new user
         nickname, email = kwargs.get('nickname'), kwargs.get('email')
@@ -106,17 +113,6 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return '<User %r>' % (self.nickname)
 
-    @classmethod
-    def try_link(cls, property, social_id):
-        """
-        # check fo r cookie, if cookie exists, link
-            # http://stackoverflow.com/questions/6666267/architecture-for-merging-multiple-user-accounts-together
-
-            # check if emails are same.
-            # is so link!
-        """
-        # import ipdb; ipdb.set_trace()
-        pass
 
     @classmethod
     def merge(cls, rv):
