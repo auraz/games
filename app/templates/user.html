@@ -2,27 +2,60 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <table>
-      <tr valign="top">
-          <td><img src="{{ user.avatar(128) }}"></td>
-          <td>
-            <h1>User: {{user.nickname}}</h1>
-              {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
-              {% if user.last_seen %}<p><i>Last seen on: {{ user.last_seen }}</i></p>{% endif %}
-              {% if user.id == g.user.id %}<p><a href="{{ url_for('edit') }}">Edit</a></p>{% endif %}
-          </td>
-      </tr>
-    </table>
-  <hr>
-  {% for team in teams %}
-  <p>
-    Team is {{ team.name }} with team members ...
-  </p>
-  {% endfor %}
-  {% for game in games %}
-  <p>
-    Game is {{ game.name }}
-  </p>
+<div class="row">
+    <!-- Start Memebr 1 -->
+    <div class="col-md-3 col-sm-6 col-xs-12" data-animation="fadeIn" data-animation-delay="03">
+        <div class="team-member modern">
+            <!-- Memebr Photo, Name & Position -->
+            <div class="member-photo">
+                <img alt="" src="{{ user.avatar() }}" />
+                <div class="member-name">{{user.nickname}}
+                </div>
+            </div>
+            <!-- Memebr Words -->
+            <div class="member-info">
+                  {% if user.about_me %}<p>{{ user.about_me }}</p>{% endif %}
+                  {% if user.last_seen %}<p><i>Last seen on: {{ user.last_seen }}</i></p>{% endif %}
 
-  {% endfor %}
+            </div>
+            <div class="member-socail">
+                    {% if user.user_social.facebook_id %}
+                                    <a class="facebook" href="http://facebook.com/profile.php?id={{user.user_social.facebook_id}}"><i class="fa fa-facebook"></i></a>
+                    {% endif %}
+                    {% if user.user_social.steam_id %}
+                                    <a class="steam" href="http://steamcommunity.com/profiles/{{user.user_social.steam_id}}"><i class="fa fa-steam"></i></a>
+                    {% endif %}
+                    {% if user.id != g.user.id %}
+                                    <a class="mail" href="mailto:{{user.email}}"><i class="fa fa-envelope"></i></a>
+                    {% endif %}
+            </div>
+            {% include 'merge.html' %}
+            <div class="member-info">
+                 Teams:
+            </div>
+            <!-- Start Progress Bars for Teams -->
+            {% for team in teams %}
+              <div class="progress-label">{{ team.name }}</div>
+              <div class="progress">
+                  <div class="progress-bar progress-bar-primary" data-progress-animation="96%" data-appear-animation-delay="400">
+                      <span class="percentage">96%</span>
+                  </div>
+              </div>
+            {% endfor %}
+            <div class="member-info">
+                 Games:
+            </div>
+            <!-- Start Progress Bars for Teams -->
+            {% for game in games %}
+              <div class="progress-label">{{ game.name }}</div>
+              <div class="progress">
+                  <div class="progress-bar progress-bar-primary" data-progress-animation="96%" data-appear-animation-delay="400">
+                      <span class="percentage">96%</span>
+                  </div>
+              </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+<!-- End Team Members -->
 {% endblock %}

@@ -40,15 +40,20 @@ class User(UserMixin, db.Model):
     )
     user_social = db.relationship('UserSocial', uselist=False, backref="user")
 
-    def avatar(self, size):
-        if self.email:
-            return 'http://www.gravatar.com/avatar/%s?d=mm&s=%d' % (
-                md5(self.email.encode('utf-8')).hexdigest(),
-                size
-            )
-        else:
-            #  details['player']['avatarmedium']
+    def avatar(self):
+        """
+        Set user avatar
+
+        1. Get from facebook
+        2. Get from steam
+        """
+        if self.user_social.facebook_id:  # get picture from facebook
+            return 'http://graph.facebook.com/{SID}/picture?type=large'.format(SID=self.user_social.facebook_id)
+        elif self.user_social.steam_id:  # get picture from steam
             pass
+
+        return #default one
+
 
     @staticmethod
     def make_unique_nickname(nickname):
@@ -88,17 +93,15 @@ class User(UserMixin, db.Model):
         if len(user_social) == 1:  # return existing user
             return user_social[0].user
 
-        linked_rv = User.try_link(social_type, social_id)
-
         # merge users if emails are equal
         if kwargs.get('email'):  # check if we have user account with same email
             # if so - merge accounts:
-            # it looks like user previously logged in with steam and set email
+            # it is case when user previously logged in with steam and set email
             # and now logs with facebook
             user = User.query.filter_by(email=kwargs.get('email')).first()
             if user:
                 setattr(user.user_social, social_type, social_id)
-            return user
+                return user  # nickname is old one
 
         # create new user
         nickname, email = kwargs.get('nickname'), kwargs.get('email')

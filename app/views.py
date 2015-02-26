@@ -7,7 +7,7 @@ from flask import Flask, render_template, request, make_response
 
 from app import app, db, lm, oid
 from forms import LoginForm, EditForm, RequestGameForm
-from models import User, Game, GameRequest, Team
+from models import User, UserSocial, Game, GameRequest, Team, TeamGameUserRelation
 from match import calculate_matches
 from oauth import OAuthSignIn
 from steam_openid import get_steam_userinfo, _steam_id_re
@@ -20,7 +20,11 @@ def oauth_authorize(provider):
     Authorize callback for oauth provider.
     """
     if not current_user.is_anonymous():
-        return redirect(url_for('index'))
+        is_facebook = current_user.user_social.facebook_id
+        is_steam = current_user.user_social.steam_id
+        if is_steam and is_facebook:
+            return redirect(url_for('index'))
+        # this means that we want to link accounts, procceed
     if provider == 'facebook':
         oauth = OAuthSignIn.get_provider(provider)
         return oauth.authorize()
@@ -58,6 +62,53 @@ def after_login(resp):
     steamdata = get_steam_userinfo(steam_id)
     nickname = steamdata['personaname']
     nickname = User.make_unique_nickname(nickname)
+    import ipdb; ipdb.set_trace()
+    if not current_user.is_anonymous():
+        assert current_user.user_social.facebook_id
+        # we already my have this user in database, with steam account
+        # so we need to merge information and delete account
+
+        # check if user already logged with steam
+        existing_steam_user_social = UserSocial.query.filter_by(steam_id=steam_id).first()
+        if existing_steam_user_social: # if we have it, do merge
+            assert not existing_steam_user_social.facebook_id
+            existing_steam_user = existing_steam_user_social.user
+
+            if existing_steam_user.nickname:
+                if current_user.nickname:
+                    current_user.nickname += ' ' + existing_steam_user.nickname
+                else:
+                    current_user.nickname = existing_steam_user.nickname
+
+            if existing_steam_user.about_me:
+                if current_user.about_me:
+                    current_user.about_me += existing_steam_user.about_me
+                else:
+                    current_user.about_me = existing_steam_user.about_me
+
+            if not current_user.email:
+                if existing_steam_user.email:
+                    current_user.email = existing_steam_user.email
+
+            # update teams_and_games, and games requests
+
+            GRs = GameRequest.query.filter_by(user_id=existing_steam_user.id).all()
+            TGURs = TeamGameUserRelation.query.filter_by(user_id=existing_steam_user.id).all()
+            for gr in GRs:
+                gr.user_id = current_user.id
+                db.sessin.add(gr)
+            for tgur in TGURs:
+                tgur.user_id = current_user.id
+                db.session.add(tgur)
+
+            # delete existing_steam_user and existing_steam_user_social
+            db.session.delete(existing_steam_user)
+            db.session.delete(existing_steam_user_social)
+            db.session.commit()
+        current_user.user_social.steam_id = steam_id
+        db.session.add(current_user)
+        db.session.commit()
+        return redirect(url_for('index'))
     user = User.get_or_create('steam', steam_id, nickname=nickname)
     if user is None:
         flash('Authentication failed.')
@@ -155,6 +206,7 @@ def nickname(nickname):
     if user == None:
         flash('User %s not found.' % nickname)
         return redirect(url_for('index'))
+
     games = [
         {
             'name': 'Dota 2'

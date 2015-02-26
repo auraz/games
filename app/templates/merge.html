@@ -1,0 +1,10 @@
+{% if not user.user_social.steam_id %}
+    <p>Please link you account to
+    <a href={{ url_for('oauth_authorize', provider='steam') }}>Steam</a> (needs to play DOTA 2)
+{% endif %}
+{% if not user.user_social.facebook_id %}
+    <p>Please link you account to
+    <a href="{{ url_for('oauth_authorize', provider='facebook') }}">Facebook</a> (needs to do non-internet activities)
+{% endif %}
+</p>
+
