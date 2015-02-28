@@ -11,6 +11,7 @@ from models import User, UserSocial, Game, GameRequest, Team, TeamGameUserRelati
 from match import calculate_matches
 from oauth import OAuthSignIn
 from steam_openid import get_steam_userinfo, _steam_id_re
+from merge_accounts import merge_accounts
 
 
 @app.route('/authorize/<provider>')
@@ -37,14 +38,16 @@ def oauth_callback(provider):
     """
     Oauth callback.
     """
-    if not current_user.is_anonymous():
-        return redirect(url_for('index'))
     oauth = OAuthSignIn.get_provider(provider)
-    social_id, username, email = oauth.callback()
+    social_id, nickname, email = oauth.callback()
     if social_id is None:
         flash('Authentication failed.')
         return redirect(url_for('index'))
-    user = User.get_or_create(provider, social_id, nickname=username, email=email)
+    if not current_user.is_anonymous():
+        user_id = current_user.id
+        merge_accounts('steam_id', 'facebook_id', social_id, nickname, user_id,email)
+        return redirect(url_for('index'))
+    user = User.get_or_create(provider, social_id, nickname=nickname, email=email)
     login_user(user, True)
     return redirect(url_for('index'))
 
@@ -61,53 +64,11 @@ def after_login(resp):
         return redirect(url_for('index'))
     steamdata = get_steam_userinfo(steam_id)
     nickname = steamdata['personaname']
-    nickname = User.make_unique_nickname(nickname)
-    import ipdb; ipdb.set_trace()
     if not current_user.is_anonymous():
-        assert current_user.user_social.facebook_id
-        # we already my have this user in database, with steam account
-        # so we need to merge information and delete account
-
-        # check if user already logged with steam
-        existing_steam_user_social = UserSocial.query.filter_by(steam_id=steam_id).first()
-        if existing_steam_user_social: # if we have it, do merge
-            assert not existing_steam_user_social.facebook_id
-            existing_steam_user = existing_steam_user_social.user
-
-            if existing_steam_user.nickname:
-                if current_user.nickname:
-                    current_user.nickname += ' ' + existing_steam_user.nickname
-                else:
-                    current_user.nickname = existing_steam_user.nickname
-
-            if existing_steam_user.about_me:
-                if current_user.about_me:
-                    current_user.about_me += existing_steam_user.about_me
-                else:
-                    current_user.about_me = existing_steam_user.about_me
-
-            if not current_user.email:
-                if existing_steam_user.email:
-                    current_user.email = existing_steam_user.email
-
-            # update teams_and_games, and games requests
-
-            GRs = GameRequest.query.filter_by(user_id=existing_steam_user.id).all()
-            TGURs = TeamGameUserRelation.query.filter_by(user_id=existing_steam_user.id).all()
-            for gr in GRs:
-                gr.user_id = current_user.id
-                db.sessin.add(gr)
-            for tgur in TGURs:
-                tgur.user_id = current_user.id
-                db.session.add(tgur)
-
-            # delete existing_steam_user and existing_steam_user_social
-            db.session.delete(existing_steam_user)
-            db.session.delete(existing_steam_user_social)
-            db.session.commit()
-        current_user.user_social.steam_id = steam_id
-        db.session.add(current_user)
-        db.session.commit()
+        # get user id, as current user is not passable to another function
+        # if code of merge is here, it works, why?
+        user_id = current_user.id
+        merge_accounts('facebook_id', 'steam_id', steam_id, nickname, user_id)
         return redirect(url_for('index'))
     user = User.get_or_create('steam', steam_id, nickname=nickname)
     if user is None:
