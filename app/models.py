@@ -134,6 +134,7 @@ class User(UserMixin, db.Model):
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256))
+    minimal_time = db.Column(db.Integer)  # minimal time to play game in minutes
     number_of_players = db.Column(db.Integer)
     teams_and_users = db.relationship('TeamGameUserRelation', backref='game', lazy='dynamic')
 
