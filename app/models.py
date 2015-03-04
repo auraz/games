@@ -7,6 +7,7 @@ from hashlib import md5
 from flask.ext.login import UserMixin
 
 from app import db
+from steam_openid import get_steam_userinfo
 
 
 class UserSocial(db.Model):
@@ -42,17 +43,12 @@ class User(UserMixin, db.Model):
 
     def avatar(self):
         """
-        Set user avatar
-
-        1. Get from facebook
-        2. Get from steam
+        Get user avatar from facebook and steam
         """
         if self.user_social.facebook_id:  # get picture from facebook
             return 'http://graph.facebook.com/{SID}/picture?type=large'.format(SID=self.user_social.facebook_id)
         elif self.user_social.steam_id:  # get picture from steam
-            pass
-
-        return #default one
+            return get_steam_userinfo(self.user_social.steam_id)['avatarfull']
 
 
     @staticmethod
@@ -105,6 +101,7 @@ class User(UserMixin, db.Model):
 
         # create new user
         nickname, email = kwargs.get('nickname'), kwargs.get('email')
+        nickname = User.make_unique_nickname(nickname)
         user = User(nickname=nickname, email=email)
         user_social = UserSocial(user=user)
         setattr(user_social, social_type, social_id)
