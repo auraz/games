@@ -116,21 +116,6 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return '<User %r>' % (self.nickname)
 
-
-    @classmethod
-    def merge(cls, rv):
-        """
-        Merge users from queryset
-        """
-        chosen_user = rv.first()
-        import ipdb; ipdb.set_trace()
-
-        # choose nickname, email and about me, and last_seen
-
-        # update other user_ids of TeamGameUserRelation and GameRequest
-
-        return chosen_user
-
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(256))
